@@ -1,0 +1,21 @@
+scripts:
+  # "denox run start" will execute main.ts with example.com networking permissions
+  start:
+    file: main.ts
+    deno_options:
+      allow-net: 0.0.0.0
+      importmap: import_map.json 
+      unstable: true
+      allow-read: true
+      allow-env: true
+      # watch: true
+  # "denox run develop" will execute main.ts with localhost networking permissions and source code cache reloaded
+  dev:
+    file: main.ts
+    deno_options:
+      allow-net: 0.0.0.0
+      reload: true
+      unstable: true
+      allow-read: true
+      allow-env: true
+      importmap: import_map.json 

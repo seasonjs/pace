@@ -1,0 +1,8 @@
+// .vscode/settings.json
+{
+    "deno.enable": true,
+    "deno.unstable": true,
+    "deno.codeLens.implementations": true,
+    "deno.importMap": "./import_map.json",
+
+}

@@ -1,0 +1,13 @@
+{
+    "imports": {
+        "http/": "https://deno.land/std@0.88.0/http/",
+        "path/": "https://deno.land/std@0.88.0/path/",
+        "oak/": "https://deno.land/x/oak@v6.5.0/",
+        "oak_logger/": "https://deno.land/x/oak_logger/",
+        "crc32/": "https://deno.land/x/crc32/",
+        "node/": "https://deno.land/std@0.88.0/node/",
+        "lodash/": "https://deno.land/x/lodash@4.17.19/",
+        "uuid/": "https://deno.land/std@0.88.0/uuid/",
+        "@/": "./src/"
+    }
+}
