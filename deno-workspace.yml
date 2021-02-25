@@ -8,6 +8,7 @@ scripts:
       unstable: true
       allow-read: true
       allow-env: true
+      allow-write: true
       # watch: true
   # "denox run develop" will execute main.ts with localhost networking permissions and source code cache reloaded
   dev:
@@ -18,4 +19,5 @@ scripts:
       unstable: true
       allow-read: true
       allow-env: true
+      allow-write: true
       importmap: import_map.json 

@@ -8,6 +8,7 @@
         "node/": "https://deno.land/std@0.88.0/node/",
         "lodash/": "https://deno.land/x/lodash@4.17.19/",
         "uuid/": "https://deno.land/std@0.88.0/uuid/",
+        "log/": "https://deno.land/std@0.88.0/log/",
         "@/": "./src/"
     }
 }

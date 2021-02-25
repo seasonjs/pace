@@ -11,11 +11,12 @@
  * Module dependencies.
  */
 
-// const debug = require('debug')('koa-generic-session:session')
+// const logger.debug = require('logger.debug')('koa-generic-session:session')
 
 import { crc32 } from "crc32/mod.ts";
 import { v4 as uid } from "uuid/mod.ts";
 // import { URL } from "node/url.ts";
+import logger from "@/helper/logger/mod.ts";
 
 import MemoryStore from "./memoryStore.ts";
 import Store from "./store.ts";
@@ -177,13 +178,14 @@ export default function (options: optionsProps) {
    * check url match cookie's path
    */
   function matchPath(ctx: any) {
+    logger.debug('currect context is',ctx);
     const pathname =new URL(ctx).pathname;
     const cookiePath = cookie.path || "/";
     if (cookiePath === "/") {
       return true;
     }
     if (pathname.indexOf(cookiePath) !== 0) {
-      //   debug('cookie path not match')
+     logger.debug('cookie path not match')
       return false;
     }
     return true;
@@ -198,10 +200,10 @@ export default function (options: optionsProps) {
   async function getSession(ctx:any) {
     if (!matchPath(ctx)) return;
     if (storeStatus === "pending") {
-      //   debug('store is disconnect and pending')
+      logger.debug('store is disconnect and pending')
       await waitStore;
     } else if (storeStatus === "unavailable") {
-      //   debug('store is unavailable')
+      logger.debug('store is unavailable')
       throw new Error("session store is unavailable");
     }
 
@@ -212,19 +214,19 @@ export default function (options: optionsProps) {
     let session;
     let isNew = false;
     if (!ctx.sessionId) {
-      //   debug("session id not exist, generate a new one");
+     logger.debug("session id not exist, generate a new one");
       session = generateSession();
       ctx.sessionId = await genSid.call(ctx, 24);
       isNew = true;
     } else {
       try {
         session = await store.get(ctx.sessionId);
-        // debug('get session %j with key %s', session, ctx.sessionId)
+        logger.debug('get session %j with key %s', session, ctx.sessionId)
       } catch (err) {
         if (err.code === "ENOENT") {
-          //   debug('get session error, code = ENOENT')
+          logger.debug('get session error, code = ENOENT')
         } else {
-          //   debug('get session error: ', err && err.message)
+          logger.debug('get session error: ', err && err.message)
           errorHandler(err, "get", ctx);
         }
       }
@@ -235,7 +237,7 @@ export default function (options: optionsProps) {
       !session ||
       !valid(ctx, session)
     ) {
-      //   debug('session is empty or invalid')
+     logger.debug('session is empty or invalid')
       session = generateSession();
       ctx.sessionId = await genSid.call(ctx, 24);
       sessionIdStore.reset.call(ctx);
@@ -260,40 +262,39 @@ export default function (options: optionsProps) {
   async function refreshSession(ctx: any,  session: any, originalHash: any, isNew: Boolean) {
     // reject any session changes, and do not update session expiry
     if (ctx._sessionSave === false) {
-      //   return debug('session save disabled')
-      return ;
+     return logger.debug('session save disabled')
+    
     }
 
     //delete session
     if (!session) {
       if (!isNew) {
-        // debug('session set to null, destroy session: %s', ctx.sessionId)
+        logger.debug('session set to null, destroy session: %s', ctx.sessionId);
         sessionIdStore.reset.call(ctx);
         return store.destroy(ctx.sessionId);
       }
-      return null;
-      //   debug('a new session and set to null, ignore destroy')
+      return logger.debug('a new session and set to null, ignore destroy');
     }
 
     // force saving non-empty session
     if (ctx._sessionSave === true) {
-    //   debug("session save forced");
+    logger.debug("session save forced");
       return saveNow(ctx, ctx.sessionId, session);
     }
 
     const newHash = hash(session);
     // if new session and not modified, just ignore
     if (!options.allowEmpty && isNew && newHash === EMPTY_SESSION_HASH) {
-    //   return debug("new session and do not modified");
+    return logger.debug("new session and do not modified");
     }
 
     // rolling session will always reset cookie and session
     if (!options.rolling && newHash === originalHash) {
-        return ;
-    //   return debug("session not modified");
+        
+    return logger.debug("session not modified");
     }
 
-    // debug("session modified");
+     logger.debug("session modified");
 
     await saveNow(ctx, ctx.sessionId, session);
   }
@@ -312,9 +313,9 @@ export default function (options: optionsProps) {
     try {
       await store.set(id, session);
       sessionIdStore.set.call(ctx, id, session);
-      //   debug('saved')
+       logger.debug('saved')
     } catch (err) {
-      //   debug('set session error: ', err && err.message)
+       logger.debug('set session error: ', err && err.message)
       errorHandler(err, "set", ctx);
     }
   }
@@ -365,10 +366,10 @@ export default function (options: optionsProps) {
     };
 
     ctx.regenerateSession = async function regenerateSession() {
-    //   debug("regenerating session");
+     logger.debug("regenerating session");
       if (!result.isNew) {
         // destroy the old session
-        // debug("destroying previous session");
+      logger.debug("destroying previous session");
         await store.destroy(ctx.sessionId);
       }
 
@@ -376,7 +377,7 @@ export default function (options: optionsProps) {
       ctx.sessionId = await genSid.call(ctx, 24);
       sessionIdStore.reset.call(ctx);
 
-    //   debug("created new session: %s", ctx.sessionId);
+    logger.debug("created new session: %s", ctx.sessionId);
       result.isNew = true;
     };
 
@@ -385,14 +386,14 @@ export default function (options: optionsProps) {
     try {
       await next();
     } catch (err) {
-    //   debug("next logic error: %s", err && err.message);
+       logger.debug("next logic error: %s", err && err.message);
       firstError = err;
     }
     // can't use finally because `refreshSession` is async
     try {
       await refreshSession(ctx, ctx.session, result.originalHash, result.isNew);
     } catch (err) {
-    //   debug("refresh session error: %s", err && err.message);
+    logger.debug("refresh session error: %s", err && err.message);
       if (firstError) ctx.app.emit("error", err, ctx);
       firstError = firstError || err;
     }
@@ -476,20 +477,20 @@ export default function (options: optionsProps) {
     };
 
     ctx.regenerateSession = async function regenerateSession() {
-      //   debug('regenerating session')
+      logger.debug('regenerating session')
       // make sure that the session has been loaded
       await ctx.session;
 
       if (!isNew) {
         // destroy the old session
-        // debug('destroying previous session')
+        logger.debug('destroying previous session')
         await store.destroy(ctx.sessionId);
       }
 
       ctx._session = generateSession();
       ctx.sessionId = await genSid.call(ctx, 24);
       sessionIdStore.reset.call(ctx);
-      //   debug('created new session: %s', ctx.sessionId)
+      logger.debug('created new session: %s', ctx.sessionId)
       isNew = true;
       return ctx._session;
     };

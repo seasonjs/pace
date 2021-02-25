@@ -12,8 +12,10 @@
  * Module dependencies.
  */
 
-// const debug = require('debug')('koa-generic-session:memory_store')
+
 //代码修改自：https://github.com/koajs/generic-session/blob/master/src/memory_store.js
+import logger from "@/helper/logger/mod.ts";
+
 class MemoryStore {
   private sessions: Record<string, any>;
   constructor() {
@@ -21,12 +23,12 @@ class MemoryStore {
   }
 
   get(sid: string) {
-    // debug('get value %j with key %s', this.sessions[sid], sid)
+    logger.debug('get value %j with key %s', this.sessions[sid], sid)
     return this.sessions[sid];
   }
 
   set(sid: string, val: any) {
-    // debug('set value %j for key %s', val, sid)
+    logger.debug('set value %j for key %s', val, sid)
     this.sessions[sid] = val;
   }
 
