@@ -92,7 +92,7 @@ export default function (options: optionsProps) {
     prefix: options?.prefix ?? "oka.sess",
   });
 
-  const genSid = options?.genSid ?? uid;
+  const genSid = options?.genSid ?? uid.generate;
   const valid = options?.valid ?? noop;
   const beforeSave = options?.beforeSave ?? noop;
 
@@ -178,8 +178,7 @@ export default function (options: optionsProps) {
    * check url match cookie's path
    */
   function matchPath(ctx: any) {
-    logger.debug('currect context is',ctx);
-    const pathname =new URL(ctx).pathname;
+    const pathname =ctx.request.url.pathname;
     const cookiePath = cookie.path || "/";
     if (cookiePath === "/") {
       return true;
