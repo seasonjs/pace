@@ -1,0 +1,21 @@
+{
+  "allow": [
+    "run", 
+    "net",
+    "env",
+    "write",
+    "read"
+  ],
+  "scripts": {
+    "start": {
+      "cmd": "deno run main.ts",
+      "desc": "Run my webserver",
+      "env": {
+        "Deno_ENV": "development"
+      },
+      "watch": true,
+      "importmap": "import_map.json",
+      "unstable": true
+    }
+  }
+}

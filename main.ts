@@ -7,6 +7,9 @@ import session from "@/helper/session/mod.ts";
 import logger from "@/helper/logger/mod.ts";
 
 const app = new Application();
+const controller = new AbortController();
+const { signal } = controller;
+
 logger.debug("pace logger start working...");
 app.keys = config.keys;
 app.addEventListener("listen", ({ hostname, port, secure }) => {
@@ -45,6 +48,7 @@ app.use(async (ctx: Record<string, any>, next) => {
 //增加query对象
 app.use(async (ctx, next) => {
   const query = helpers.getQuery(ctx, { mergeParams: true });
+  logger.debug(`query${JSON.stringify(ctx.request)}`)
   Object.defineProperties(ctx.request, {
     "query": {
       value: query,
@@ -66,7 +70,7 @@ app.use(async (ctx: Record<string, any>, next) => {
   logger.debug(`当前ctx为${JSON.stringify(ctx.request)}`);
   if (ctx.request.query?.callback) {
     let body = typeof ctx.response.body === "object"
-      ? JSON.stringify(ctx.body, undefined, 2)
+      ? JSON.stringify(ctx.response.body, undefined, 2)
       : ctx.response.body;
     ctx.response.body = ctx.request.query.callback + "(" + body + ")";
     ctx.response.type = "application/x-javascript";
@@ -78,4 +82,5 @@ app.use(router.allowedMethods());
 
 await app.listen({
   port: config.serve.port,
+  signal
 });

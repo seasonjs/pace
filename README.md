@@ -1,13 +1,15 @@
-#pace
+# pace
+使用Deno构建的前端监控后台服务
 
+## 快速开发指南
 install denox
 
 ```
-deno install -Af -n denox https://raw.githubusercontent.com/Cyberhan123/denox/@0.4.2/denox.ts
+deno install -qAf --unstable https://deno.land/x/denon/denon.ts
 ```
 
 run application
 
 ```
-denox run start
+denon run start
 ```
